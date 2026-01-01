@@ -1,0 +1,36 @@
+---
+title: "Bean Overview"
+description: "Spring IoC container quản lý các beans. Những bean được tạo ra với configuration metadata mà bạn cung cấp cho container"
+---
+
+## Overriding Beans
+
+Bean overriding xảy ra khi có hai bean cùng tên được định nghĩa trong cùng một `ApplicationContext`.
+
+Theo mặc định, Spring Framework cho phép việc này và bean được định nghĩa sau sẽ ghi đè lên bean được định nghĩa trước đó.
+
+Tuy nhiên, bạn có thể cấu hình ApplicationContext để không cho phép việc ghi đè bean bằng cách đặt thuộc tính `allowBeanDefinitionOverriding` thành `false`.
+Khi đó, nếu có hai bean cùng tên được định nghĩa, Spring sẽ ném ra một ngoại lệ `BeanDefinitionOverrideException`.
+
+## Bean Scopes
+Spring hỗ trợ 6 scopes cho bean:
+| Scope | Description                           |
+| -------- | ------------------------------------- |
+| singleton     | (Default) Single object instance cho mỗi Spring IoC container                     |
+| prototype      | Single bean definition cho một hoặc nhiều object instances                         |
+| request   | Mỗi `HTTP request` có một object instance riêng được tạo từ single bean definition. Chỉ dùng trong web applications |
+| session     | Mỗi `HTTP session` có một object instance riêng được tạo từ single bean definition. Chỉ dùng trong web applications |
+| application      | Single bean definition trong lifecycle cho mỗi `ServletContext`. Chỉ dùng trong web applications |
+| websocket   | Single bean definition trong lifecycle cho mỗi `WebSocket`. Chỉ dùng trong web applications |
+
+### Singleton Scope
+Là scope mặc định trong Spring. Một bean với singleton scope sẽ chỉ có một instance duy nhất trong container.
+Mỗi lần bean được yêu cầu, container sẽ trả về cùng một instance. Nên sử dụng cho stateless beans.
+
+![Figure 2. Singleton Scope](../../images/ioc-container/singleton.png)
+
+### Prototype Scope
+Một bean với prototype scope sẽ tạo ra một instance mới mỗi khi bean được yêu cầu từ container.
+Container sẽ không quản lý lifecycle của các instance này sau khi chúng được tạo ra. Nên sử dụng cho stateful beans.
+![Figure 3. Prototype Scope](../../images/ioc-container/prototype.png)
+

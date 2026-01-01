@@ -1,97 +1,66 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Container Overview"
+description: ""
 ---
 
-## Setting up
+`org.springframework.context.ApplicationContext` là interface đại diện cho Spring IoC container.
+Nó chịu trách nhiệm tạo ra, cấu hình và lắp ráp các beans trong ứng dụng của bạn.
 
-Get your documentation site up and running in minutes.
+Một số triển khai của interface ApplicationContext bao gồm: `ClassPathXmlApplicationContext`, `FileSystemXmlApplicationContext`, và `AnnotationConfigApplicationContext`.
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+![Figure 1. The Spring IoC container](../../images/ioc-container/image.png)
 
-## Make it yours
+## Dependency Injection
 
-Design a docs site that looks great and empowers your users.
+DI là một mẫu thiết kế mà các phụ thuộc (dependencies) của một đối tượng được cung cấp (injected) từ bên ngoài thay vì đối tượng tự tạo hoặc tìm kiếm chúng.
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+Trong Spring, DI được thực hiện thông qua việc cấu hình các beans trong IoC container.
+Khi một bean được yêu cầu, container sẽ tạo ra bean đó và tự động cung cấp các phụ thuộc cần thiết dựa trên cấu hình đã định nghĩa.
 
-## Create beautiful pages
+DI có thể được thực hiện thông qua constructor injection, setter injection, hoặc field injection.
 
-Everything you need to create world-class documentation.
+### Constructor-based Dependency Injection
+Constructor-based DI sử dụng constructor của lớp để cung cấp các phụ thuộc cần thiết.
+Khi một bean được tạo ra, container sẽ gọi constructor với các tham số tương ứng với các phụ thuộc đã định nghĩa.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+```java ConstructorInjection.java example lines icon="java"
+public class SimpleMovieLister {
 
-## Need inspiration?
+    // the SimpleMovieLister has a dependency on a MovieFinder
+    private final MovieFinder movieFinder;
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+    // a constructor so that the Spring container can inject a MovieFinder
+    public SimpleMovieLister(MovieFinder movieFinder) {
+        this.movieFinder = movieFinder;
+    }
+
+    // business logic that actually uses the injected MovieFinder is omitted...
+}
+```
+
+### Setter-based Dependency Injection
+Setter-based DI sử dụng các phương thức setter để cung cấp các phụ thuộc cần thiết.
+Khi một bean được tạo ra, container sẽ gọi các phương thức setter với các giá trị tương ứng với các phụ thuộc đã định nghĩa.
+
+```java SetterInjection.java example lines icon="java"
+public class SimpleMovieLister {
+
+    // the SimpleMovieLister has a dependency on a MovieFinder
+    private MovieFinder movieFinder;
+
+    // a setter so that the Spring container can inject a MovieFinder
+    public void setMovieFinder(MovieFinder movieFinder) {
+        this.movieFinder = movieFinder;
+    }
+
+    // business logic that actually uses the injected MovieFinder is omitted...
+}
+```
+<Accordion title="Constructor-based or setter-based DI?">
+  Constructor-based DI được ưu tiên hơn vì nó đảm bảo rằng các dependencies cần thiết được cung cấp ngay khi đối tượng được tạo ra, 
+  giúp tránh các lỗi liên quan đến việc sử dụng đối tượng chưa được khởi tạo đầy đủ.
+  Ngoài ra, constructor-based DI cho phép tạo ra các `immutable` objects và đảm bảo các dependencies không `null`.
+
+  Setter-based DI có thể hữu ích trong các trường hợp mà một số dependencies là tùy chọn hoặc khi cần thay đổi dependencies sau khi đối tượng đã được tạo ra.
+
+</Accordion>

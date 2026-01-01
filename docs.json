@@ -15,15 +15,20 @@
         "groups": [
           {
             "group": "Core Technologies",
-            "expanded": false,
             "pages": [
-              "core-technologies/ioc-container/index",
+              {
+                "group": "IoC Container",
+                "pages": [
+                  "core-technologies/ioc-container/index",
+                  "core-technologies/ioc-container/bean"
+                ]
+              },
               "core-technologies/quickstart",
               "core-technologies/development"
             ]
           },
 
-
+          
           {
             "group": "Customization",
             "pages": [
