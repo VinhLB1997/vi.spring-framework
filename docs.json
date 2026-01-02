@@ -9,6 +9,20 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Documentation",
+          "icon": "book-open-cover",
+          "href": "https://mintlify.com/docs"
+        },
+        {
+          "anchor": "Blog",
+          "icon": "newspaper",
+          "href": "https://mintlify.com/blog"
+        }
+      ]
+    },
     "tabs": [
       {
         "tab": "Spring Framework",
@@ -20,15 +34,14 @@
                 "group": "IoC Container",
                 "pages": [
                   "core-technologies/ioc-container/index",
-                  "core-technologies/ioc-container/bean"
+                  "core-technologies/ioc-container/bean",
+                  "spring-framework/core-technologies/io-c-container/untitled-page"
                 ]
               },
               "core-technologies/quickstart",
               "core-technologies/development"
             ]
           },
-
-          
           {
             "group": "Customization",
             "pages": [
@@ -75,21 +88,7 @@
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/spring-logo.svg",

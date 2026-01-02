@@ -9,28 +9,121 @@ Bean overriding xảy ra khi có hai bean cùng tên được định nghĩa tro
 
 Theo mặc định, Spring Framework cho phép việc này và bean được định nghĩa sau sẽ ghi đè lên bean được định nghĩa trước đó.
 
-Tuy nhiên, bạn có thể cấu hình ApplicationContext để không cho phép việc ghi đè bean bằng cách đặt thuộc tính `allowBeanDefinitionOverriding` thành `false`.
-Khi đó, nếu có hai bean cùng tên được định nghĩa, Spring sẽ ném ra một ngoại lệ `BeanDefinitionOverrideException`.
+Tuy nhiên, bạn có thể cấu hình ApplicationContext để không cho phép việc ghi đè bean bằng cách đặt thuộc tính `allowBeanDefinitionOverriding` thành `false`. Khi đó, nếu có hai bean cùng tên được định nghĩa, Spring sẽ ném ra một ngoại lệ `BeanDefinitionOverrideException`.
 
 ## Bean Scopes
+
 Spring hỗ trợ 6 scopes cho bean:
-| Scope | Description                           |
-| -------- | ------------------------------------- |
-| singleton     | (Default) Single object instance cho mỗi Spring IoC container                     |
-| prototype      | Single bean definition cho một hoặc nhiều object instances                         |
-| request   | Mỗi `HTTP request` có một object instance riêng được tạo từ single bean definition. Chỉ dùng trong web applications |
+
+| Scope       | Description                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------------- |
+| singleton   | (Default) Single object instance cho mỗi Spring IoC container                                                       |
+| prototype   | Single bean definition cho một hoặc nhiều object instances                                                          |
+| request     | Mỗi `HTTP request` có một object instance riêng được tạo từ single bean definition. Chỉ dùng trong web applications |
 | session     | Mỗi `HTTP session` có một object instance riêng được tạo từ single bean definition. Chỉ dùng trong web applications |
-| application      | Single bean definition trong lifecycle cho mỗi `ServletContext`. Chỉ dùng trong web applications |
-| websocket   | Single bean definition trong lifecycle cho mỗi `WebSocket`. Chỉ dùng trong web applications |
+| application | Single bean definition trong lifecycle cho mỗi `ServletContext`. Chỉ dùng trong web applications                    |
+| websocket   | Single bean definition trong lifecycle cho mỗi `WebSocket`. Chỉ dùng trong web applications                         |
 
 ### Singleton Scope
-Là scope mặc định trong Spring. Một bean với singleton scope sẽ chỉ có một instance duy nhất trong container.
-Mỗi lần bean được yêu cầu, container sẽ trả về cùng một instance. Nên sử dụng cho stateless beans.
+
+Là scope mặc định trong Spring. Một bean với singleton scope sẽ chỉ có một instance duy nhất trong container. Mỗi lần bean được yêu cầu, container sẽ trả về cùng một instance. Nên sử dụng cho stateless beans.
 
 ![Figure 2. Singleton Scope](../../images/ioc-container/singleton.png)
 
 ### Prototype Scope
-Một bean với prototype scope sẽ tạo ra một instance mới mỗi khi bean được yêu cầu từ container.
-Container sẽ không quản lý lifecycle của các instance này sau khi chúng được tạo ra. Nên sử dụng cho stateful beans.
+
+Một bean với prototype scope sẽ tạo ra một instance mới mỗi khi bean được yêu cầu từ container. Container sẽ không quản lý lifecycle của các instance này sau khi chúng được tạo ra. Nên sử dụng cho stateful beans.
+
 ![Figure 3. Prototype Scope](../../images/ioc-container/prototype.png)
 
+## @Bean Annotation
+
+`@Bean` là một method-level annotation, có thể dùng trong class sử dụng `@Configuration`, `@Component`
+
+Để khai báo bean, sử dụng `@Bean` annotation trên method. Mặc định, tên bean sẽ là tên method khai báo.
+
+### Cách Spring xử lý các bean
+
+1. **Hiểu rõ chế độ "Full" vs "Lite"**
+
+Mặc dù bạn có thể sử dụng `@Bean` bên trong các lớp `@Component`, nhưng tốt nhất nên đặt chúng trong các lớp được đánh dấu là `@Configuration`.
+
+- Chế độ **Full**: Trong lớp `@Configuration`, các phương thức `@Bean` được xử lý qua proxy CGLIB. Điều này đảm bảo tính Singleton: nếu phương thức A gọi phương thức B (cả hai đều là `@Bean`), Spring sẽ trả về instance đã tồn tại thay vì tạo mới.
+- Chế độ **Lite**: Trong lớp `@Component`, việc gọi trực tiếp phương thức `@Bean` khác sẽ tạo ra một đối tượng mới hoàn toàn, phá vỡ nguyên tắc Singleton của Spring.
+
+<CodeGroup>
+
+```java Configuration.java
+@Configuration
+public class AppConfig {
+
+  @Bean
+  ServiceA serviceA() {
+    return new ServiceA();
+  }
+
+  @Bean
+  ServiceB serviceB() {
+    return new ServiceB(serviceA()); // An toàn vì có CGLIB Proxy
+  }
+  
+  @Bean
+  ServiceC serviceC() {
+    return new ServiceC(serviceA()); // An toàn vì có CGLIB Proxy
+  }
+}
+
+// Output Log
+ServiceA: com.example.test.dto.ServiceA@6723610b
+ServiceB: ServiceB(serviceA=com.example.test.dto.ServiceA@6723610b)
+ServiceC: ServiceC(serviceA=com.example.test.dto.ServiceA@6723610b)
+```
+
+
+```java Component.java
+@Component
+public class AppConfig {
+
+  @Bean
+  ServiceA serviceA() {
+    return new ServiceA();
+  }
+
+  @Bean
+  ServiceB serviceB() {
+    return new ServiceB(serviceA());
+  }
+  
+  @Bean
+  ServiceC serviceC() {
+    return new ServiceC(serviceA());
+  }
+}
+
+// Output Log
+ServiceA: com.example.test.dto.ServiceA@3ba0ae41
+ServiceB: ServiceB(serviceA=com.example.test.dto.ServiceA@4da39ca9)
+ServiceC: ServiceC(serviceA=com.example.test.dto.ServiceA@6a9344f5)
+```
+
+</CodeGroup>
+
+2. **Định nghĩa Dependency giữa các Bean**
+
+- **Cách 1 (Inter-bean reference):** Gọi trực tiếp phương thức:
+
+```java icon=java lines
+@Bean
+public ServiceA serviceA() {
+    return new ServiceA(serviceB()); // An toàn vì có CGLIB Proxy
+}
+```
+
+- **Cách 2 (Method Parameter):** Truyền Bean vào như một tham số. Đây là cách khuyên dùng vì nó hoạt động tốt cả trong chế độ Lite (`@Component`) và giúp code rõ ràng hơn:
+
+```java icon=java lines
+@Bean
+public ServiceA serviceA(ServiceB b) {
+    return new ServiceA(b); 
+}
+```
