@@ -1,0 +1,57 @@
+---
+title: "Additional Capabilities of the ApplicationContext"
+description: "Như đã thảo luận ở các phần trước, org.springframework.beans.factory package cung cấp các chức năng cơ bản để quản lý và thao tác với các bean. Thêm vào đó, org.springframework.context package cung cấp ApplicationContext interface bổ sung chức năng cho BeanFactory interface. Ngoài các chức năng chính đó, nó còn bổ sung một số tính năng sau."
+---
+
+1. **Hỗ trợ đa ngôn ngữ (Internationalization - i18n)**
+
+`ApplicationContext` kế thừa giao diện `MessageSource`, cho phép ứng dụng dễ dàng giải quyết các thông báo (messages) dựa trên Locale (ngôn ngữ và quốc gia):
+
+**Cơ chế:** `ApplicationContext`tìm kiếm một Bean có tên là `messageSource`. Nếu tìm thấy, nó sẽ ủy quyền việc giải quyết thông báo cho Bean này. Nếu không tìm thấy,  nó sẽ cố gắng tìm kiếm một parent có chứa bean cùng tên để sử dụng như `MessageSource` . Nếu không tìm thấy bất cứ bean nào liên quan, một empty `DelegatingMessageSource` sẽ được khởi tạo để xử lý các lệnh gọi liên quan đến `getMessage` .
+
+- Quản lý các message bundles
+- Hỗ trợ tham số hóa message
+- Giải quyết message theo locale cụ thể
+
+```java
+String message = context.getMessage("greeting", new Object[]{"John"}, Locale.US);
+```
+
+2. **Cơ chế Sự kiện (Event Publication)**
+
+`ApplicationContext` cho phép các Bean giao tiếp với nhau theo mô hình **Pub-Sub (Publisher-Subscriber)** mà không cần biết trực tiếp về nhau, giúp giảm sự phụ thuộc (loose coupling).
+
+- **Giao diện:** Sử dụng `ApplicationEventPublisher`.
+- **Thành phần:** \* **Event:** Đối tượng chứa dữ liệu (kế thừa `ApplicationEvent`).
+  - **Publisher:** Bean gửi sự kiện.
+  - **Listener:** Bean nhận sự kiện (sử dụng `@EventListener` hoặc triển khai `ApplicationListener`).
+
+3. **Truy cập tài nguyên (Resource Loading)**
+
+Truy cập tài nguyên một cách thống nhất qua `ResourceLoader`:
+
+- Load file từ classpath, file system, URL
+- Hỗ trợ wildcards và patterns
+- Abstraction layer cho việc truy cập tài nguyên
+
+```java
+Resource resource = context.getResource("classpath:config.xml");
+```
+
+4. **Quản lý Môi trường và Profile (Environment Abstraction)**
+
+`ApplicationContext` tích hợp giao diện `EnvironmentCapable`, giúp quản lý các cấu hình khác nhau cho từng môi trường (Development, Staging, Production).
+
+- **Profiles**: Kích hoạt/vô hiệu hóa bean definitions theo môi trường
+- **Properties**: Truy cập system properties, environment variables
+- Hỗ trợ property placeholders và SpEL expressions
+
+<Accordion title="So sánh nhanh: BeanFactory vs ApplicationContext">
+| Tính năng     | BeanFactory     | ApplicationContext     |
+| --------- | --------- | --------- |
+| Khởi tạo Bean | Lazy (khi được gọi mới tạo) | Eager (tạo ngay khi startup - mặc định) |
+| i18n (MessageSource) | Không hỗ trợ | Hỗ trợ đầy đủ |
+| Event Publication | Không hỗ trợ | Hỗ trợ đầy đủ |
+| AOP Integration | Phải cấu hình thủ công | Tự động tích hợp |
+| Annotation Support | Hạn chế | Tối ưu hóa hoàn toàn |
+</Accordion>

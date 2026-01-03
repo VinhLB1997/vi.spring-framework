@@ -3,4 +3,6 @@ title: "Environment Abstraction"
 description: "Environment interface được tích hợp cùng Container. Nó tham gia 2 khía cạnh của môi trường ứng dụng là: profiles và .properties"
 ---
 
-`Profile` là tên một nhóm các bean definitions chỉ được đăng kí với container nếu `Profile` đó được active. 
+`Profile` là tên một nhóm các bean definitions chỉ được đăng kí với container nếu `Profile` đó được active.
+
+`@PropertySource` annotation dùng để khai báo resource vào `Environment`. Để inject value vào trong variable sử dụng `${…​}`

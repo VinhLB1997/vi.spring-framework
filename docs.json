@@ -35,7 +35,8 @@
                 "pages": [
                   "core-technologies/ioc-container/index",
                   "core-technologies/ioc-container/bean",
-                  "spring-framework/core-technologies/io-c-container/untitled-page"
+                  "spring-framework/core-technologies/io-c-container/untitled-page",
+                  "spring-framework/core-technologies/io-c-container/additional-capabilities-of-the-application-context"
                 ]
               },
               "core-technologies/quickstart",
