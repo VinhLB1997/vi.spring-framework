@@ -49,3 +49,19 @@ public class CustomerValidator implements Validator {
 ```
 
 ## Data Binding
+
+### `Data Binding` là gì?
+
+`Data Binding` là quá trình ánh xạ (mapping) dữ liệu từ các nguồn bên ngoài (như tham số truy vấn trên URL, dữ liệu từ Form HTML, hoặc JSON) vào các thuộc tính của một đối tượng Java.
+
+### Cách thức hoạt động của `Data Binding`
+
+Quy trình diễn ra cơ bản qua các bước sau:
+
+1. **Tiếp nhận Request:** Người dùng gửi một yêu cầu (GET hoặc POST) kèm dữ liệu.
+2. **Khởi tạo DataBinder:** Spring tạo ra một đối tượng `WebDataBinder`.
+3. **Chuyển đổi kiểu dữ liệu (Conversion):** Đây là bước quan trọng nhất. Vì dữ liệu từ HTTP luôn là chuỗi (String), Spring cần chuyển chúng sang đúng kiểu dữ liệu của thuộc tính (như `int`, `boolean`, `Date`, hoặc các Object phức tạp).
+4. **Gán giá trị (Populating):** Sau khi chuyển đổi thành công, giá trị được gán vào các trường của POJO.
+5. **Kiểm tra lỗi (BindingResult):** Nếu có lỗi (ví dụ: nhập chữ vào trường số), Spring sẽ lưu lỗi vào đối tượng `BindingResult` thay vì làm ứng dụng bị "sập".
+
+## Java Bean Validation
