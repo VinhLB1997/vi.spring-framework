@@ -65,3 +65,13 @@ Quy trình diễn ra cơ bản qua các bước sau:
 5. **Kiểm tra lỗi (BindingResult):** Nếu có lỗi (ví dụ: nhập chữ vào trường số), Spring sẽ lưu lỗi vào đối tượng `BindingResult` thay vì làm ứng dụng bị "sập".
 
 ## Java Bean Validation
+
+**Java Bean Validation** là một đặc tả (specification) của Java (hiện nay là **Jakarta Bean Validation**) cho phép bạn định nghĩa các quy tắc kiểm tra dữ liệu bằng cách sử dụng các **Annotation** ngay trên các trường (fields) của class.
+
+| Loại     | Annotation     | Ý nghĩa     |
+| --------- | --------- | --------- |
+| Kiểm tra Null | `@NotNull`, `@NotEmpty`, `@NotBlank` | Kiểm tra không null, không rỗng, hoặc không chỉ chứa khoảng trắng. |
+| Kích thước | `@Size(min=, max=)`, `@Min`, `@Max` | Giới hạn độ dài chuỗi, số lượng phần tử mảng hoặc giá trị số. |
+| Định dạng | `@Email`, `@Pattern(regexp=)` | Kiểm tra email hợp lệ hoặc khớp với biểu thức chính quy (Regex). |
+| Logic | `@AssertTrue`, `@AssertFalse` | Kiểm tra giá trị boolean. |
+| Thời gian | `@Past`, `@Future` | Kiểm tra ngày tháng phải ở quá khứ hoặc tương lai. |

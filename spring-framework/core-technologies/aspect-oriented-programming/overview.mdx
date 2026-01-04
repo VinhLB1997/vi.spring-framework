@@ -1,0 +1,70 @@
+---
+title: "Overview"
+description: "Lập trình hướng đối tượng (OOP) phân chia ứng dụng theo các Class (Lớp), thì AOP giúp bạn phân chia ứng dụng theo các Concerns (Mối quan tâm)."
+---
+
+## 1. Spring AOP là gì?
+
+**Spring AOP** là một phương thức lập trình cho phép tách rời các xử lý "cắt ngang" ứng dụng (Cross-cutting concerns) ra khỏi logic nghiệp vụ chính.
+
+Hãy tưởng tượng bạn có 10 phương thức xử lý thanh toán, và cả 10 phương thức này đều cần thực hiện: **Ghi log, Kiểm tra bảo mật, Quản lý giao dịch (Transaction)**.
+
+- **OOP:** Bạn phải viết lại các đoạn code đó ở cả 10 nơi.
+- **AOP:** Bạn chỉ cần viết code xử lý log ở 1 nơi duy nhất (gọi là Aspect), sau đó "cấu hình" để nó tự động nhảy vào 10 phương thức kia.
+
+## 2. Các thuật ngữ "phải biết" trong AOP
+
+AOP có một bộ thuật ngữ hơi trừu tượng, nhưng hãy hiểu chúng theo cách đơn giản sau:
+
+- **Aspect (Khía cạnh):** Một module tập trung các xử lý cắt ngang (ví dụ: `LoggingAspect`).
+- **Join Point (Điểm nối):** Một điểm trong quá trình thực thi chương trình, nơi mà Aspect có thể được chèn vào (trong Spring AOP, đây luôn là việc **gọi một phương thức**).
+- **Advice (Lời khuyên/Xử lý):** Hành động cụ thể mà Aspect thực hiện tại một Join Point (ví dụ: In ra dòng chữ "Bắt đầu chạy hàm...").
+- **Pointcut (Điểm cắt):** Một biểu thức (thường dùng SpEL hoặc cú pháp riêng) để xác định Join Point nào sẽ nhận được Advice. (Ví dụ: "Tất cả các hàm trong package service").
+- **Target Object:** Đối tượng bị tác động bởi Aspect.
+- **Proxy:** Đối tượng được Spring tạo ra để bọc lấy Target Object nhằm thực thi các Advice.
+
+## 3. Các loại Advice (Khi nào thì code chạy?)
+
+Spring cung cấp 5 loại Advice tùy theo thời điểm bạn muốn can thiệp:
+
+| Loại Advice         | Thời điểm thực thi                                                                                                                   |
+| :------------------ | :----------------------------------------------------------------------------------------------------------------------------------- |
+| **Before**          | Chạy trước khi phương thức mục tiêu được gọi.                                                                                        |
+| **After**           | Chạy sau khi phương thức mục tiêu kết thúc (dù thành công hay có lỗi).                                                               |
+| **After Returning** | Chỉ chạy khi phương thức mục tiêu kết thúc thành công.                                                                               |
+| **After Throwing**  | Chỉ chạy khi phương thức mục tiêu ném ra ngoại lệ (exception).                                                                       |
+| **Around**          | **Mạnh mẽ nhất**, bao quanh phương thức mục tiêu. Có thể quyết định khi nào chạy phương thức đó, hoặc có cho phép nó chạy hay không. |
+
+## 4. Cách Spring AOP hoạt động (Proxy Pattern)
+
+Spring AOP không can thiệp trực tiếp vào mã nguồn của bạn. Thay vào đó, nó tạo ra một **Proxy** (đối tượng ủy quyền).
+
+Khi bạn gọi một hàm trong Bean, bạn thực chất đang gọi thông qua Proxy. Proxy này sẽ:
+
+1. Thực hiện các logic **Before**.
+2. Gọi hàm thực của bạn.
+3. Thực hiện các logic **After**.
+
+## 5. Ví dụ minh họa nhanh
+
+Giả sử bạn muốn log lại thời gian chạy của tất cả các Service:
+```java
+@Aspect
+@Component
+public class LoggingAspect {
+
+    // Pointcut: Áp dụng cho mọi phương thức trong package service
+    @Around("execution(* com.example.service.*.*(..))")
+    public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        long start = System.currentTimeMillis();
+
+        // Thực thi phương thức gốc
+        Object proceed = joinPoint.proceed();
+
+        long executionTime = System.currentTimeMillis() - start;
+        System.out.println(joinPoint.getSignature() + " chạy trong " + executionTime + "ms");
+        
+        return proceed;
+    }
+}
+```

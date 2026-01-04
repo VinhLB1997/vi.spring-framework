@@ -40,7 +40,20 @@
                 ]
               },
               "core-technologies/quickstart",
-              "core-technologies/development"
+              "core-technologies/development",
+              {
+                "group": "Spring Expression Language (SpEL)",
+                "pages": [
+                  "spring-framework/core-technologies/spring-expression-language-sp-el/untitled-page"
+                ]
+              },
+              {
+                "group": "Aspect Oriented Programming",
+                "pages": [
+                  "spring-framework/core-technologies/aspect-oriented-programming/overview",
+                  "spring-framework/core-technologies/aspect-oriented-programming/aop-concepts"
+                ]
+              }
             ]
           },
           {

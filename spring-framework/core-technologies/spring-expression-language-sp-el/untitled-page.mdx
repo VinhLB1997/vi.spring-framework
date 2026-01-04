@@ -1,0 +1,67 @@
+---
+title: "Overview"
+description: "SpEL là một công cụ giúp ứng dụng Spring trở nên "linh động" hơn. Thay vì fix cứng các giá trị, bạn có thể để chúng tự tính toán dựa trên trạng thái của hệ thống."
+---
+
+## 1. SpEL là gì?
+
+**Spring Expression Language (SpEL)** là một ngôn ngữ biểu thức mạnh mẽ được tích hợp sâu vào Spring Framework. Nó cho phép bạn truy vấn và thao tác với các đối tượng (object graph), gọi phương thức, truy cập thuộc tính, và thực hiện các phép toán logic/số học ngay trong cấu hình của Spring.
+
+## 2. Phân biệt quan trọng: `#{...}` và `${...}`
+
+Rất nhiều người mới bắt đầu thường nhầm lẫn giữa hai ký hiệu này:
+
+- `${property.name}`**(Property Placeholder):**  Chỉ dùng để lấy giá trị từ các file cấu hình (như `application.properties`). Nó không xử lý được logic.
+- `#{expression}`**(SpEL):**  Có thể thực hiện tính toán, gọi hàm, truy cập Bean khác... và thậm chí lồng cả `${}` vào bên trong.
+  - _Ví dụ:_ `#{systemProperties['user.home']}`
+
+## 3. Các tính năng nổi bật của SpEL
+
+SpEL cung cấp một dải tính năng rất rộng, giúp code của bạn linh hoạt hơn:
+
+### a. Thao tác với Bean và Thuộc tính
+
+Bạn có thể lấy giá trị từ một Bean này để gán cho Bean khác.
+
+```java
+@Value("#{userBean.name}")
+private String userName;
+```
+
+### b. Gọi phương thức (Method Invocation)
+
+```java
+@Value("#{userBean.getName().toUpperCase()}")
+private String upperName;
+```
+
+### c. Toán tử Elvis (`?:`) và Safe Navigation (`?.`)
+
+Giúp tránh lỗi `NullPointerException` một cách cực kỳ gọn nhẹ.
+
+- **Safe Navigation:** `#{user.address?.city}` (Nếu address null, trả về null thay vì văng lỗi).
+- **Elvis Operator:** `#{user.age ?: 18}` (Nếu age null, lấy giá trị mặc định là 18).
+
+### d. Làm việc với Types (T-operator)
+
+Bạn có thể gọi các hằng số hoặc phương thức static từ các lớp Java tiêu chuẩn.
+
+```java
+@Value("#{T(java.lang.Math).PI}")
+private double pi;
+```
+
+## 5. Quy trình xử lý của SpEL (Dành cho nâng cao)
+
+Nếu bạn muốn tự dùng SpEL trong code logic của mình, quy trình sẽ gồm 4 bước:
+
+1. **ExpressionParser:** Trình phân tích cú pháp biểu thức.
+2. **Expression:** Đối tượng đại diện cho biểu thức đã được phân tích.
+3. **EvaluationContext:** Ngữ cảnh chứa dữ liệu (đối tượng) mà biểu thức sẽ tác động lên.
+4. **Value:** Kết quả trả về.
+
+```java
+ExpressionParser parser = new SpelExpressionParser();
+Expression exp = parser.parseExpression("'Hello ' + 'World'");
+String message = (String) exp.getValue(); // Kết quả: "Hello World"
+```
