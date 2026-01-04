@@ -57,10 +57,9 @@
             ]
           },
           {
-            "group": "Customization",
+            "group": "Data Access",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "essentials/settings"
             ]
           },
           {
